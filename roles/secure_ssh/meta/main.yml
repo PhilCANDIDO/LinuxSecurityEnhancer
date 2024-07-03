@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Your Name
+  description: Secures the SSH service to mitigate vulnerabilities
+  company: Your Company
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: RedHat
+      versions:
+        - 8
+        - 9
+    - name: Debian
+      versions:
+        - 10
+        - 11
+        - 12
+dependencies: []

@@ -1,0 +1,165 @@
+---
+- name: (analyze_ssh_config) Get current SSH configuration
+  ansible.builtin.command: sshd -T
+  register: sshd_config_output
+  tags: analyze
+
+- name: (analyze_ssh_config) Check PermitRootLogin
+  ansible.builtin.debug:
+    msg: "Directive 'PermitRootLogin' is set correctly to 'no'."
+  when: "'permitrootlogin no' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_permitrootlogin_correct
+
+- set_fact:
+    result_permitrootlogin_correct: "succeeded"
+  when: "'permitrootlogin no' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check PermitRootLogin (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'PermitRootLogin' is not set to 'no'. Please rerun the playbook with '--tags PermitRootLogin'."
+  when: "'permitrootlogin no' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check PasswordAuthentication
+  ansible.builtin.debug:
+    msg: "Directive 'PasswordAuthentication' is set correctly to 'no'."
+  when: "'passwordauthentication no' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_passwordauthentication_correct
+
+- set_fact:
+    result_passwordauthentication_correct: "succeeded"
+  when: "'passwordauthentication no' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check PasswordAuthentication (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'PasswordAuthentication' is not set to 'no'. Please rerun the playbook avec '--tags PasswordAuthentication'."
+  when: "'passwordauthentication no' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check ChallengeResponseAuthentication
+  ansible.builtin.debug:
+    msg: "Directive 'ChallengeResponseAuthentication' is set correctly to 'no'."
+  when: "'challengeresponseauthentication no' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_challengeresponseauthentication_correct
+
+- set_fact:
+    result_challengeresponseauthentication_correct: "succeeded"
+  when: "'challengeresponseauthentication no' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check ChallengeResponseAuthentication (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'ChallengeResponseAuthentication' is not set to 'no'. Please rerun the playbook avec '--tags ChallengeResponseAuthentication'."
+  when: "'challengeresponseauthentication no' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check MaxAuthTries
+  ansible.builtin.debug:
+    msg: "Directive 'MaxAuthTries' is set correctly to '3'."
+  when: "'maxauthtries 3' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_maxauthtries_correct
+
+- set_fact:
+    result_maxauthtries_correct: "succeeded"
+  when: "'maxauthtries 3' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check MaxAuthTries (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'MaxAuthTries' is not set to '3'. Please rerun the playbook avec '--tags MaxAuthTries'."
+  when: "'maxauthtries 3' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check X11Forwarding
+  ansible.builtin.debug:
+    msg: "Directive 'X11Forwarding' is set correctly to 'no'."
+  when: "'x11forwarding no' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_x11forwarding_correct
+
+- set_fact:
+    result_x11forwarding_correct: "succeeded"
+  when: "'x11forwarding no' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check X11Forwarding (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'X11Forwarding' is not set to 'no'. Please rerun the playbook avec '--tags X11Forwarding'."
+  when: "'x11forwarding no' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check UseDNS
+  ansible.builtin.debug:
+    msg: "Directive 'UseDNS' is set correctly to 'no'."
+  when: "'usedns no' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_usedns_correct
+
+- set_fact:
+    result_usedns_correct: "succeeded"
+  when: "'usedns no' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check UseDNS (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'UseDNS' is not set to 'no'. Please rerun the playbook avec '--tags UseDNS'."
+  when: "'usedns no' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check LoginGraceTime
+  ansible.builtin.debug:
+    msg: "Directive 'LoginGraceTime' is set correctly to '0'."
+  when: "'logingracetime 0' in sshd_config_output.stdout"
+  tags: analyze
+  register: result_logingracetime_correct
+
+- set_fact:
+    result_logingracetime_correct: "succeeded"
+  when: "'logingracetime 0' in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Check LoginGraceTime (Incorrect)
+  ansible.builtin.debug:
+    msg: "Directive 'LoginGraceTime' is not set to '0'. Please rerun the playbook avec '--tags LoginGraceTime'."
+  when: "'logingracetime 0' not in sshd_config_output.stdout"
+  tags: analyze
+
+- name: (analyze_ssh_config) Calculate Correct Checks
+  ansible.builtin.set_fact:
+    correct_checks: >-
+      {{
+        ((result_permitrootlogin_correct is defined and result_permitrootlogin_correct == "succeeded") | ternary(1, 0)) +
+        ((result_passwordauthentication_correct is defined and result_passwordauthentication_correct == "succeeded") | ternary(1, 0)) +
+        ((result_challengeresponseauthentication_correct is defined and result_challengeresponseauthentication_correct == "succeeded") | ternary(1, 0)) +
+        ((result_maxauthtries_correct is defined and result_maxauthtries_correct == "succeeded") | ternary(1, 0)) +
+        ((result_x11forwarding_correct is defined and result_x11forwarding_correct == "succeeded") | ternary(1, 0)) +
+        ((result_usedns_correct is defined and result_usedns_correct == "succeeded") | ternary(1, 0)) +
+        ((result_logingracetime_correct is defined and result_logingracetime_correct == "succeeded") | ternary(1, 0))
+      | int }}
+  tags: analyze
+
+- name: (analyze_ssh_config) Total Checks
+  ansible.builtin.set_fact:
+    total_checks: 7
+  tags: analyze
+
+- name: (analyze_ssh_config) Debug Values
+  ansible.builtin.debug:
+    msg: "total_checks={{ total_checks }}, correct_checks={{ correct_checks }}"
+  tags: analyze
+
+- name: (analyze_ssh_config) Calculate Compliance Score
+  ansible.builtin.set_fact:
+    compliance_score: "{{ ((correct_checks|int * 100.0) / total_checks|int) | round(0) }}"
+  tags: analyze
+
+- name: (analyze_ssh_config) Display Compliance Score
+  ansible.builtin.debug:
+    msg: "SSH configuration compliance score: {{ compliance_score }}%"
+  tags: analyze

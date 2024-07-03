@@ -1,0 +1,75 @@
+---
+- name: (ssh_config) Ensure SSH configuration directory exists
+  ansible.builtin.file:
+    path: /etc/ssh
+    state: directory
+  tags: always
+
+- name: (ssh_config) Backup current sshd_config
+  ansible.builtin.command: cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+  args:
+    creates: /etc/ssh/sshd_config.bak
+  tags: always
+
+- name: (ssh_config) Disable root login from sshd
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin\s+'
+    line: 'PermitRootLogin no'
+    state: present
+  notify: restart sshd
+  tags: PermitRootLogin, never
+
+- name: (ssh_config) Ensure PasswordAuthentication is disabled
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication\s+'
+    line: 'PasswordAuthentication no'
+    state: present
+  notify: restart sshd
+  tags: PasswordAuthentication, never
+
+- name: (ssh_config) Apply additional security configurations
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?ChallengeResponseAuthentication\s+'
+    line: 'ChallengeResponseAuthentication no'
+    state: present
+  notify: restart sshd
+  tags: ChallengeResponseAuthentication, never
+
+- name: (ssh_config) Set MaxAuthTries to 3
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?MaxAuthTries\s+'
+    line: 'MaxAuthTries 3'
+    state: present
+  notify: restart sshd
+  tags: MaxAuthTries, never
+  
+- name: (ssh_config) Disable X11Forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?X11Forwarding\s+'
+    line: 'X11Forwarding no'
+    state: present
+  notify: restart sshd
+  tags: X11Forwarding, never
+  
+- name: (ssh_config) Disable UseDNS
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?UseDNS\s+'
+    line: 'UseDNS no'
+    state: present
+  notify: restart sshd
+  tags: UseDNS, never
+
+- name: (ssh_config) Set LoginGraceTime to 0 based on CERTFR-2024-ALE-009
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?LoginGraceTime\s+'
+    line: 'LoginGraceTime 0'
+    state: present
+  notify: restart sshd
+  tags: LoginGraceTime, never

@@ -1,0 +1,15 @@
+---
+- include_tasks: 
+    file: ssh_config.yml
+  tags: 
+    - PermitRootLogin
+    - PasswordAuthentication
+    - ChallengeResponseAuthentication
+    - MaxAuthTries
+    - X11Forwarding
+    - UseDNS
+    - LoginGraceTime
+
+- include_tasks: analyze_ssh_config.yml
+  tags:
+    - analyze
