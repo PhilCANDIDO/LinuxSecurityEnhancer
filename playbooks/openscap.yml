@@ -13,5 +13,5 @@
 
     - name: Import role openscap
       import_role: 
-        name: openscap
+        name: roles/openscap
       become: "{{ true if ansible_system == 'Linux' else omit }}"
