@@ -15,8 +15,8 @@
     path: "{{ openscap_result_directory }}"
     state: directory
     mode: '0777'
-    owner: "{{ ansible_remote_user | default(ansible_user) }}"
-    group: "{{ ansible_remote_user | default(ansible_user) }}"
+    owner: "{{ ansible_remote_user | default(ansible_ssh_user, true) | default(lookup('env', 'USER')) }}"
+    group: "{{ ansible_remote_user | default(ansible_ssh_user, true) | default(lookup('env', 'USER')) }}"
   delegate_to: "{{ openscap_presentation_server }}"
 
 - name: (scanning_RedHat) get results
