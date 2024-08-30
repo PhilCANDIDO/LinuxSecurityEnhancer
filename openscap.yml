@@ -1,0 +1,17 @@
+---
+- name: Deploy OpenSCAP
+  hosts: all
+  become: true
+  collections:
+    - ansible.posix
+    - community.general.htpasswd
+
+  tasks:
+    - name: Include openscap.yml variables.
+      include_vars: "openscap.yml"
+      tags: always
+
+    - name: Import role openscap
+      import_role: 
+        name: openscap
+      become: "{{ true if ansible_system == 'Linux' else omit }}"
