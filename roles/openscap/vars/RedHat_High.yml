@@ -1,12 +1,18 @@
-# RedHat scan profile High
+---
+# Base path for the SCAP content
 openscap_rhel_ssg_base_path: "/usr/share/xml/scap/ssg/content"
+
+# Condition for determining the XML definition file name
 openscap_rhel_ssg_ds_name: >-
   {% if ansible_distribution | lower == 'oraclelinux' %}
   ssg-ol{{ ansible_distribution_major_version }}-ds.xml
   {% else %}
   ssg-{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-ds.xml
   {% endif %}
-openscap_rhel_ssg_ds: "{{ openscap_rhel_ssg_base_path }}/{{ openscap_rhel_ssg_ds_name }}"
+
+# Full path to the SCAP data stream file
+openscap_rhel_ssg_ds: "{{ openscap_rhel_ssg_base_path }}/{{ openscap_rhel_ssg_ds_name | trim }}"
+
 openscap_rhel_profile: xccdf_org.ssgproject.content_profile_anssi_bp28_high
 openscap_rhel_results: anssi_bp28_high.xml
 openscap_rhel_report: anssi_bp28_high.html
