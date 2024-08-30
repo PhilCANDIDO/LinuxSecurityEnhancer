@@ -12,7 +12,7 @@ openscap_rhel_ssg_ds_name: >-
   {% endif %}
 
 # Full path to the SCAP data stream file
-openscap_rhel_ssg_ds: "{{ openscap_rhel_ssg_base_path }}/{{ openscap_rhel_ssg_ds_name }}"
+openscap_rhel_ssg_ds: "{{ openscap_rhel_ssg_base_path }}/{{ openscap_rhel_ssg_ds_name | trim }}"
 
 # SCAP profile to use for the evaluation
 openscap_rhel_profile: "xccdf_org.ssgproject.content_profile_anssi_bp28_minimal"

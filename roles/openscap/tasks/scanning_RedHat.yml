@@ -6,7 +6,7 @@
     --results /tmp/{{ openscap_rhel_results }}
     --report /tmp/{{ openscap_rhel_report }}
     --fetch-remote-resources
-    {{ openscap_rhel_ssg_ds | trim }}
+    {{ openscap_rhel_ssg_ds }}
   register: oscap_eval
   failed_when: not (oscap_eval.rc == 0 or oscap_eval.rc == 2)
 
