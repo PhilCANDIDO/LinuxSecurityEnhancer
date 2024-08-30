@@ -1,0 +1,92 @@
+---
+- name: (install_Debian) install prerequisites
+  ansible.builtin.apt:
+    state:  present
+    pkg: 
+    - curl
+    - librpm9
+    - libxslt1.1
+    - libxmlsec1
+    - libxmlsec1-openssl
+    - libpcre3
+
+- name: "(install_Debian) Copy .deb {{ openscap_debian_deb }}"
+  ansible.builtin.copy:
+    src:  "{{ openscap_debian_deb }}"
+    dest: "/tmp/{{ openscap_debian_deb }}"
+
+- name: "(install_Debian) Install {{ openscap_debian_deb }}"
+  ansible.builtin.apt:
+    deb: "/tmp/{{ openscap_debian_deb }}"
+
+- name: "(install_Debian) Copy .deb {{ openscap_debian_ssg_base }}"
+  ansible.builtin.copy:
+    src:  "{{ openscap_debian_ssg_base }}"
+    dest: "/tmp/{{ openscap_debian_ssg_base }}"
+
+- name: "(install_Debian) Copy .deb {{ openscap_debian_ssg_application }}"
+  ansible.builtin.copy:
+    src:  "{{ openscap_debian_ssg_application }}"
+    dest: "/tmp/{{ openscap_debian_ssg_application }}"
+
+- name: "(install_Debian) Install {{ openscap_debian_ssg_application }}"
+  ansible.builtin.apt:
+    deb: "/tmp/{{ openscap_debian_ssg_application }}"
+
+- name: "(install_Debian) Copy .deb {{ openscap_debian_ssg_debian }}"
+  ansible.builtin.copy:
+    src:  "{{ openscap_debian_ssg_debian }}"
+    dest: "/tmp/{{ openscap_debian_ssg_debian }}"
+  when: ansible_distribution == 'Debian'
+
+- name: "(install_Debian) Install {{ openscap_debian_ssg_debian }}"
+  ansible.builtin.apt:
+    deb: "/tmp/{{ openscap_debian_ssg_debian }}"
+  when: ansible_distribution == 'Debian'
+
+- name: "(install_Debian) Copy .deb {{ openscap_debian_ssg_debderived }}"
+  ansible.builtin.copy:
+    src:  "{{ openscap_debian_ssg_debderived }}"
+    dest: "/tmp/{{ openscap_debian_ssg_debderived }}"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: "(install_Debian) Install {{ openscap_debian_ssg_debderived }}"
+  ansible.builtin.apt:
+    deb: "/tmp/{{ openscap_debian_ssg_debderived }}"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: (install_Debian) LD config file /etc/ld.so.conf.d/openscap.conf
+  ansible.builtin.template:
+    src:  openscap.conf.j2
+    dest: /etc/ld.so.conf.d/openscap.conf
+  notify:
+    - reload ldconfig
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: "(install_Debian) cleanup {{ openscap_debian_deb }}"
+  ansible.builtin.file:
+    path: "/tmp/{{ openscap_debian_deb }}"
+    state: absent
+
+- name: "(install_Debian) cleanup {{ openscap_debian_ssg_base }}"
+  ansible.builtin.file:
+    path: "/tmp/{{ openscap_debian_ssg_base }}"
+    state: absent
+
+- name: "(install_Debian) cleanup {{ openscap_debian_ssg_debian }}"
+  ansible.builtin.file:
+    path: "/tmp/{{ openscap_debian_ssg_debian }}"
+    state: absent
+
+- name: "(install_Debian) cleanup {{ openscap_debian_ssg_debderived }}"
+  ansible.builtin.file:
+    path: "/tmp/{{ openscap_debian_ssg_debderived }}"
+    state: absent
+
+- name: (install_Debian) check openscap execution
+  ansible.builtin.shell: oscap --version
+  register: oscap_currentversion
+  failed_when: oscap_currentversion.rc != 0
+

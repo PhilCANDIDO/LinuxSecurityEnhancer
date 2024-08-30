@@ -1,0 +1,58 @@
+---
+- name: (setting_httpd) Ensure httpd is installed
+  ansible.builtin.yum:
+    name: httpd
+    state: present
+
+- name: (setting_httpd) Ensure port {{ openscap_port }} is listening
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^Listen {{ openscap_port }}'
+    line: 'Listen {{ openscap_port }}'
+    state: present
+
+- name: (setting_httpd) Deploy httpd configuration for openscap
+  template:
+    src: httpd-openscap.conf.j2
+    dest: /etc/httpd/conf.d/09-openscap.conf
+  notify: restart httpd
+
+- name: (setting_httpd) Ensure httpd is running and enabled
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: (setting_httpd) Ensure Python package manager is present
+  ansible.builtin.package:
+    name: python3-pip
+    state: present
+
+- name: (setting_httpd) Install passlib library
+  ansible.builtin.pip:
+    name: passlib
+    state: present
+
+- name: (setting_httpd) Ensure htpasswd file exists
+  ansible.builtin.file:
+    path: "{{ htpasswd_file }}"
+    state: touch
+    mode: '0640'
+    owner: apache
+    group: root
+
+- name: (setting_httpd) Add or update htpasswd user
+  community.general.htpasswd:
+    path: "{{ htpasswd_file }}"
+    name: "{{ htpasswd_user }}"
+    password: "{{ htpasswd_password }}"
+
+- name: "(setting_httpd)  Add custom firewalld ports for central group"
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    zone: public
+  loop:
+    - "{{ openscap_port }}/tcp"
+  when: enable_firewall | bool

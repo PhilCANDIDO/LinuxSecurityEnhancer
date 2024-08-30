@@ -1,0 +1,27 @@
+---
+# defaults file for roles/openscap
+openscap_debian_deb: openscap_1.3.7-26_amd64.deb
+openscap_debian_ssg_base: ssg-base_0.1.65-1_all.deb
+openscap_debian_ssg_debian: ssg-debian_0.1.65-1_all.deb
+openscap_debian_ssg_debderived: ssg-debderived_0.1.68-1_all.deb
+
+## Directories
+openscap_presentation_server: "localhost"
+openscap_result_directory: /openscap
+
+## Windows scanning
+openscap_windows2k22_msi: "OpenSCAP-1.3.4-win32.msi"
+openscap_windows2k22_directory: "C:\\oscap"
+openscap_windows2k22_benchmark: "U_MS_Windows_Server_2022_V1R2_STIG_SCAP_1-2_Custom.xml"
+openscap_windows2k22_profile: xccdf_mil.disa.stig_profile_MAC-3_Public
+openscap_windows2k22_result_directory: "{{ openscap_windows2k22_directory }}\\results"
+openscap_windows2k22_results: "U_MS_Windows_Server_2022_STIG_V1R2.xml"
+openscap_windows2k22_report: "U_MS_Windows_Server_2022_STIG_V1R2.html"
+
+## Setting_httpd
+openscap_directory: "{{ openscap_result_directory }}"
+openscap_port: 8080
+htpasswd_file: "/etc/httpd/.htpasswd"
+htpasswd_user: "admin"
+htpasswd_password: "Centreon!"
+enable_firewall: true

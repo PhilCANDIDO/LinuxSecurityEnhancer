@@ -1,0 +1,13 @@
+---
+- name: (install_RedHat) install prerequisites
+  ansible.builtin.yum:
+    state: present
+    name:
+      - openscap
+      - openscap-scanner
+      - scap-security-guide
+
+- name: (install_RedHat) check openscap execution
+  ansible.builtin.shell: oscap --version
+  register: oscap_currentversion
+  failed_when: oscap_currentversion.rc != 0

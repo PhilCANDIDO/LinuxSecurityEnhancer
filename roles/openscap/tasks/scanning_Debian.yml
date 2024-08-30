@@ -1,0 +1,40 @@
+---
+
+- name: "(scanning_Debian) oscap eval from xccdf ds {{ openscap_debian_ssg_ds }} (Debian)"
+  ansible.builtin.shell: oscap xccdf eval --profile {{ openscap_debian_profile }} --skip-rule xccdf_org.ssgproject.content_rule_sudo_remove_nopasswd --skip-rule xccdf_org.ssgproject.content_rule_package_syslogng_installed --skip-rule xccdf_org.ssgproject.content_rule_service_syslogng_enabled --skip-rule xccdf_org.ssgproject.content_rule_apt_sources_list_official --results /tmp/{{ openscap_debian_results }} --report /tmp/{{ openscap_debian_report }} --fetch-remote-resources {{ openscap_debian_ssg_ds }}
+  register: oscap_eval
+  failed_when: not (oscap_eval.rc == 0 or oscap_eval.rc == 2)
+  when: ansible_distribution == 'Debian'
+
+- name: (scanning_Debian) oscap eval (Ubuntu)
+  ansible.builtin.shell: oscap xccdf eval --profile {{ openscap_debian_profile }} --skip-rule xccdf_org.ssgproject.content_rule_sudo_remove_nopasswd --skip-rule xccdf_org.ssgproject.content_rule_package_syslogng_installed --skip-rule xccdf_org.ssgproject.content_rule_service_syslogng_enabled --results /tmp/{{ openscap_debian_results }} --report /tmp/{{ openscap_debian_report }} --fetch-remote-resources /usr/share/xml/scap/ssg/content/ssg-ubuntu2204-ds-1.2.xml
+  register: oscap_eval
+  failed_when: not (oscap_eval.rc == 0 or oscap_eval.rc == 2)
+  when: ansible_distribution == 'Ubuntu'
+
+- name: (scanning_Debian) result directory {{ openscap_result_directory }}
+  ansible.builtin.file:
+    path: "{{ openscap_result_directory }}"
+    state: directory
+    mode: '0777'
+    owner: "{{ ansible_remote_user }}"
+    group: "{{ ansible_remote_user }}"
+  delegate_to: "{{ openscap_presentation_server }}"
+
+- name: (scanning_Debian) get results
+  ansible.builtin.fetch:
+    src: "/tmp/{{ openscap_debian_results }}"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/results/{{ ansible_date_time.iso8601_basic_short }}_{{ openscap_debian_results }}"
+    flat: yes
+
+- name: (scanning_Debian) get report
+  ansible.builtin.fetch:
+    src: "/tmp/{{ openscap_debian_report }}"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/report/{{ ansible_date_time.iso8601_basic_short }}_{{ openscap_debian_report }}"
+    flat: yes
+
+- name: "(scanning_Debian) Copy results files"
+  ansible.builtin.copy:
+    src:  "{{ openscap_result_directory }}/{{ inventory_hostname }}"
+    dest: "{{ openscap_result_directory }}"
+  delegate_to: "{{ openscap_presentation_server }}"

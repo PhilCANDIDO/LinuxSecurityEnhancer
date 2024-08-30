@@ -1,0 +1,40 @@
+---
+# tasks file for roles/openscap
+- name: Check given variable
+  fail: 
+    msg: "'profile' is not defined. Choose profile value like Debian_Average, Debian_High, Debian_Restricted, Ubuntu_Level1, Ubuntu_Level2, RedHat_Minimal, RedHat_Intermediary, RedHat_Enhanced, RedHat_High ..."
+  when: profile is not defined
+  tags: always 
+
+- name: Include {{ profile }}.yml variables.
+  include_vars: "{{  profile  }}.yml"
+  tags: always
+
+- name: Include OS-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+        - debian.yml
+      paths:
+        - "vars"
+  when: ansible_distribution == 'Debian'
+  tags: always
+
+- include_tasks: 
+    file: "install_{{ ansible_os_family }}.yml"
+    apply:
+      tags: install
+  tags: install
+
+- include_tasks: 
+    file: "scanning_{{ ansible_os_family }}.yml"
+    apply:
+      tags: scanning
+  tags: scanning
+
+- include_tasks: 
+    file: "setting_httpd.yml"
+    apply:
+      tags: setting_httpd
+  tags: setting_httpd,never

@@ -1,0 +1,17 @@
+<VirtualHost *:{{ openscap_port }}>
+    ServerName {{ ansible_fqdn }}
+
+    Alias /openscap {{ openscap_directory }}
+
+    <Directory {{ openscap_directory }}>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        AuthType Basic
+        AuthName "Restricted Access"
+        AuthUserFile {{ htpasswd_file }}
+        Require valid-user
+    </Directory>
+
+    ErrorLog /var/log/httpd/openscap_error.log
+    CustomLog /var/log/httpd/openscap_access.log combined
+</VirtualHost>

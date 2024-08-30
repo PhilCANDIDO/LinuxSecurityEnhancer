@@ -1,0 +1,8 @@
+---
+# defaults file for roles/openscap
+openscap_debian_deb: openscap_1.3.7-26_amd64.deb
+openscap_debian_ssg_base: ssg-base_0.1.65-1_all.deb
+openscap_debian_ssg_debian: ssg-debian_0.1.65-1_all.deb
+openscap_debian_ssg_debderived: ssg-debderived_0.1.68-1_all.deb
+openscap_debian_ssg_application: ssg-applications_0.1.65-1_all.deb
+openscap_debian_ssg_ds: "/usr/share/xml/scap/ssg/content/ssg-debian11-ds.xml"

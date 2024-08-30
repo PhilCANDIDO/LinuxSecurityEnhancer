@@ -1,0 +1,32 @@
+---
+- name: "(scanning_RedHat) oscap eval (RedHat)"
+  ansible.builtin.shell: oscap xccdf eval --profile {{ openscap_rhel_profile }} --results /tmp/{{ openscap_rhel_results }} --report /tmp/{{ openscap_rhel_report }} --fetch-remote-resources {{ openscap_rhel_ssg_ds }}
+  register: oscap_eval
+  failed_when: not (oscap_eval.rc == 0 or oscap_eval.rc == 2)
+
+- name: (scanning_RedHat) result directory {{ openscap_result_directory }}
+  ansible.builtin.file:
+    path: "{{ openscap_result_directory }}"
+    state: directory
+    mode: '0777'
+    owner: "{{ ansible_remote_user }}"
+    group: "{{ ansible_remote_user }}"
+  delegate_to: "{{ openscap_presentation_server }}"
+
+- name: (scanning_RedHat) get results
+  ansible.builtin.fetch:
+    src: "/tmp/{{ openscap_rhel_results }}"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/results/{{ ansible_date_time.iso8601_basic_short }}_{{ openscap_rhel_results }}"
+    flat: yes
+
+- name: (scanning_RedHat) get report
+  ansible.builtin.fetch:
+    src: "/tmp/{{ openscap_rhel_report }}"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/report/{{ ansible_date_time.iso8601_basic_short }}_{{ openscap_rhel_report }}"
+    flat: yes
+
+- name: "(scanning_RedHat) copy results files"
+  ansible.builtin.copy:
+    src: "{{ openscap_result_directory }}/{{ inventory_hostname }}"
+    dest: "{{ openscap_result_directory }}"
+  delegate_to: "{{ openscap_presentation_server }}"

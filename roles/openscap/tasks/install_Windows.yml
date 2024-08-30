@@ -1,0 +1,25 @@
+--- 
+
+- name: (install_Windows) Create directory {{ openscap_windows2k22_directory }}
+  ansible.windows.win_file:
+    path: "{{ openscap_windows2k22_directory }}"
+    state: directory
+
+- name: "(install_Windows) Copy {{ openscap_windows2k22_msi }}"
+  ansible.windows.win_copy:
+    src:  "{{ openscap_windows2k22_msi }}"
+    dest: "{{ openscap_windows2k22_directory }}\\{{ openscap_windows2k22_msi }}"
+
+- name: "(install_Windows) install {{ openscap_windows2k22_msi }}"
+  ansible.windows.win_package:
+    path: "{{ openscap_windows2k22_directory }}\\{{ openscap_windows2k22_msi }}"
+    state: present
+    arguments:
+    - /passive
+    - /norestart
+    log_path: "{{ openscap_windows2k22_directory }}\\{{ openscap_windows2k22_msi }}{{lookup('pipe', 'date +%Y%m%dT%H%M%S')}}.log"
+
+- name: "(install_Windows) clean {{ openscap_windows2k22_msi }}"
+  ansible.windows.win_file:
+    path: "{{ openscap_windows2k22_directory }}\\{{ openscap_windows2k22_msi }}"
+    state: absent

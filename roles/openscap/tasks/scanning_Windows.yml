@@ -1,0 +1,89 @@
+---
+
+- name: (scanning_Windows) result directory {{ openscap_windows2k22_result_directory }}
+  ansible.windows.win_file:
+    path: "{{ openscap_windows2k22_result_directory }}"
+    state: directory
+
+- name: "(scanning_Windows) Copy {{ openscap_windows2k22_benchmark }}"
+  ansible.windows.win_copy:
+    src:  "{{ openscap_windows2k22_benchmark }}"
+    dest: "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_benchmark }}"
+
+- name: "(scanning_Windows) Add rules exclusions"
+  set_fact:
+    exclude_rules: "--skip-rule xccdf_mil.disa.stig_rule_SV-254378r877395_rule --skip-rule xccdf_mil.disa.stig_rule_SV-254379r877382_rule --skip-rule xccdf_mil.disa.stig_rule_SV-254380r877395_rule --skip-rule xccdf_mil.disa.stig_rule_SV-254381r877395_rule --skip-rule xccdf_mil.disa.stig_rule_SV-254382r877382_rule"
+  when: ansible_windows_domain_member == false
+
+- name: "(scanning_Windows) Debug message"
+  ansible.builtin.debug:
+    msg: 'oscap xccdf eval --profile {{ openscap_windows2k22_profile }} {{ exclude_rules }} --results "{{ openscap_windows2k22_result_directory }}\{{ openscap_windows2k22_results }}" --report "{{ openscap_windows2k22_result_directory }}\{{ openscap_windows2k22_report }}" --fetch-remote-resources "{{ openscap_windows2k22_result_directory }}\{{ openscap_windows2k22_benchmark }}"'
+  when: debug is defined
+
+# - name: (scanning_Windows) oscap eval 
+#   ansible.windows.win_shell: "oscap xccdf eval --profile {{ openscap_windows2k22_profile }} {{ exclude_rules }} --results \"{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_results }}\" --report \"{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_report }}\" --fetch-remote-resources \"{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_benchmark }}\""
+#   register: oscap_eval
+#   failed_when: oscap_eval.rc == 2
+#   when: ansible_windows_domain_member == false
+
+- name: "(scanning_Windows) Debug message"
+  ansible.builtin.debug:
+    msg: 'oscap xccdf eval --profile {{ openscap_windows2k22_profile }} --results "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_results }}" --report "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_report }}" --fetch-remote-resources "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_benchmark }}"'
+  when: debug is defined
+
+- name: (scanning_Windows) oscap eval 
+  ansible.windows.win_shell: "oscap xccdf eval --profile {{ openscap_windows2k22_profile }} --results \"{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_results }}\" --report \"{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_report }}\" --fetch-remote-resources \"{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_benchmark }}\""
+  register: oscap_eval
+  failed_when: oscap_eval.rc == 2
+  # when: ansible_windows_domain_member == true
+
+- name: (scanning_Windows) result directory {{ openscap_result_directory }}
+  ansible.builtin.file:
+    path: "{{ openscap_result_directory }}"
+    state: directory
+    mode: '0777'
+  delegate_to: ansible_local
+
+- name: (scanning_Windows) get results
+  ansible.builtin.fetch:
+    src: "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_results }}"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/results/{{ ansible_date_time.iso8601_basic_short }}_{{ openscap_windows2k22_results }}"
+    flat: yes
+
+- name: (scanning_Windows) clean results oscap file
+  ansible.windows.win_file:
+    path: "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_results }}"
+    state: absent
+
+- name: (scanning_Windows) get report
+  ansible.builtin.fetch:
+    src: "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_report }}"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/report/{{ ansible_date_time.iso8601_basic_short }}_{{ openscap_windows2k22_report }}"
+    flat: yes
+
+- name: (scanning_Windows) clean report oscap file
+  ansible.windows.win_file:
+    path: "{{ openscap_windows2k22_result_directory }}\\{{ openscap_windows2k22_report }}"
+    state: absent
+
+- name: (scanning_Windows) Export secedit
+  ansible.windows.win_shell: "SecEdit.exe /export /cfg \"{{ openscap_windows2k22_result_directory }}\\secedit_export.txt\""
+  register: secedit_eval
+  failed_when: secedit_eval.rc == 2
+  tags:
+    - secedit_export
+
+- name: (scanning_Windows) get secedit export
+  ansible.builtin.fetch:
+    src: "{{ openscap_windows2k22_result_directory }}\\secedit_export.txt"
+    dest: "{{ openscap_result_directory }}/{{ inventory_hostname }}/results/{{ ansible_date_time.iso8601_basic_short }}_secedit_export.txt"
+    flat: yes
+  tags:
+    - secedit_export
+
+- name: (scanning_Windows) clean secedit export
+  ansible.windows.win_file:
+    path: "{{ openscap_windows2k22_result_directory }}\\secedit_export.txt"
+    state: absent
+    tags:
+    - secedit_export

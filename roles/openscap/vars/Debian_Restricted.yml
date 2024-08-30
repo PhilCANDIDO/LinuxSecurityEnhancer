@@ -1,0 +1,4 @@
+# Debian scan profile Restrictive
+openscap_debian_profile: xccdf_org.ssgproject.content_profile_anssi_np_nt28_restrictive
+openscap_debian_results: anssi_np_nt28_restrictive.xml
+openscap_debian_report: anssi_np_nt28_restrictive.html

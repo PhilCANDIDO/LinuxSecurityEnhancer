@@ -1,0 +1,9 @@
+---
+# handlers file for roles/openscap
+- name : reload ldconfig
+  ansible.builtin.command: ldconfig
+
+- name: restart httpd
+  ansible.builtin.service:
+    name: httpd
+    state: restarted

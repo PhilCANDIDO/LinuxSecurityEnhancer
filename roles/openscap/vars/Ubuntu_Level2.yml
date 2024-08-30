@@ -1,0 +1,4 @@
+# Ubuntu scan profile Level_1
+openscap_debian_profile: xccdf_org.ssgproject.content_profile_cis_level2_server
+openscap_debian_results: cis_level2_server.xml
+openscap_debian_report: cis_level2_server.html

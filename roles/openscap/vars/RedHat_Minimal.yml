@@ -1,0 +1,7 @@
+# Debian scan profile Minimal
+openscap_rhel_ssg_base_path: "/usr/share/xml/scap/ssg/content"
+openscap_rhel_ssg_ds_name: "ssg-{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-ds.xml"
+openscap_rhel_ssg_ds: "{{ openscap_rhel_ssg_base_path }}/{{ openscap_rhel_ssg_ds_name }}"
+openscap_rhel_profile: xccdf_org.ssgproject.content_profile_anssi_bp28_minimal
+openscap_rhel_results: anssi_bp28_minimal.xml
+openscap_rhel_report: anssi_bp28_minimal.html
