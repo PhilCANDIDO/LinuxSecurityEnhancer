@@ -68,7 +68,7 @@ To use the roles provided by `LinuxSecurityEnhancer`, include them in your Ansib
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/LinuxSecurityEnhancer.git
+   git clone https://github.com/PhilCANDIDO/LinuxSecurityEnhancer.git
    ```
 
 2. Navigate to the project directory:
