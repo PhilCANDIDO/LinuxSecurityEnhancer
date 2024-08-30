@@ -1,7 +1,9 @@
 # Redhat scan profile Minimal
+
+# Base path for the SCAP content
 openscap_rhel_ssg_base_path: "/usr/share/xml/scap/ssg/content"
 
-# Condition pour le nom du fichier de définition XML
+# Condition for determining the XML definition file name
 openscap_rhel_ssg_ds_name: >-
   {% if ansible_distribution | lower == 'oraclelinux' %}
   ssg-ol{{ ansible_distribution_major_version }}-ds.xml
@@ -9,7 +11,12 @@ openscap_rhel_ssg_ds_name: >-
   ssg-{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-ds.xml
   {% endif %}
 
+# Full path to the SCAP data stream file
 openscap_rhel_ssg_ds: "{{ openscap_rhel_ssg_base_path }}/{{ openscap_rhel_ssg_ds_name }}"
-openscap_rhel_profile: xccdf_org.ssgproject.content_profile_anssi_bp28_minimal
-openscap_rhel_results: anssi_bp28_minimal.xml
-openscap_rhel_report: anssi_bp28_minimal.html
+
+# SCAP profile to use for the evaluation
+openscap_rhel_profile: "xccdf_org.ssgproject.content_profile_anssi_bp28_minimal"
+
+# File names for storing results and reports
+openscap_rhel_results: "anssi_bp28_minimal.xml"
+openscap_rhel_report: "anssi_bp28_minimal.html"
